@@ -24,6 +24,10 @@ func writeTestFiles() {
 
 func TestLocalGetter(t *testing.T) {
 	assert := assert.New(t)
+	// relative path
+	getter0, _ := NewLocalGetter("file://./repo")
+	assert.Equal("./repo", getter0.root)
+
 	writeTestFiles()
 	getter, _ := NewGetter("file://" + testFilePath)
 	pkgs, err := getter.List("my-pkg", "")

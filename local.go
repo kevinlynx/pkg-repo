@@ -3,22 +3,19 @@ package pkgrepo
 import (
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 type LocalGetter struct {
 	root string
 }
 
-func NewLocalGetter(url0 string) (Getter, error) {
-	u, err := url.Parse(url0)
-	if err != nil {
-		return nil, err
-	}
-	return &LocalGetter{root: u.Path}, nil
+func NewLocalGetter(url0 string) (*LocalGetter, error) {
+	root := strings.TrimPrefix(url0, "file://")
+	return &LocalGetter{root: root}, nil
 }
 
 func (self *LocalGetter) List(name string, ver string) ([]*Package, error) {
