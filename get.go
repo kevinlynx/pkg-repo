@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/go-version"
 	"io"
+	"net/url"
 	"os"
 	"regexp"
 	"sort"
@@ -23,6 +24,23 @@ type Package struct {
 type Getter interface {
 	Get(pkg *Package, path string) (string, error)
 	List(pattern string) ([]*Package, error)
+}
+
+func NewGetter(url0 string, args ...interface{}) (Getter, error) {
+	u, err := url.Parse(url0)
+	if err != nil {
+		return nil, err
+	}
+	if u.Scheme == "oss" {
+		conffile := ""
+		if len(args) > 0 {
+			if s, ok := args[0].(string); ok {
+				conffile = s
+			}
+		}
+		return NewOssGetter(url0, conffile)
+	}
+	return nil, errors.New("not supported")
 }
 
 func MatchLatest(pkgs []*Package) *Package {
