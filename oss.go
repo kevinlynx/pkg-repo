@@ -1,6 +1,7 @@
 package pkgrepo
 
 import (
+	"fmt"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"gopkg.in/ini.v1"
 	"net/url"
@@ -69,10 +70,12 @@ func (self *OssGetter) List(name string, ver string) ([]*Package, error) {
 	}
 	pkgs := make([]*Package, 0, len(lor.Objects))
 	for _, object := range lor.Objects {
-		_, name := path.Split(object.Key)
-		pkg := &Package{Name: name, URL: object.Key, Checksum: strings.Trim(object.ETag, "\"")}
+		_, filename := path.Split(object.Key)
+		pkg := &Package{Name: filename, URL: object.Key, Checksum: strings.Trim(object.ETag, "\"")}
 		if err := pkg.parseVersion(name); err == nil {
 			pkgs = append(pkgs, pkg)
+		} else {
+			fmt.Printf("ignore invalid version pkg: %s, %v\n", object.Key, err)
 		}
 	}
 	return pkgs, nil

@@ -49,7 +49,7 @@ func MatchLatest(pkgs []*Package) *Package {
 }
 
 func (pkg *Package) parseVersion(prefix string) error {
-	re, err := regexp.Compile(prefix + `[-_](.+)\..+`)
+	re, err := regexp.Compile(prefix + `[_-](.+)\..+`)
 	if err != nil {
 		return err
 	}
@@ -62,6 +62,10 @@ func (pkg *Package) parseVersion(prefix string) error {
 		return err
 	}
 	return nil
+}
+
+func (pkg *Package) Version() string {
+	return pkg.ver.String()
 }
 
 func md5sumFile(path string) (string, error) {
