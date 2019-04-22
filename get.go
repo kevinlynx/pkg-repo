@@ -12,8 +12,6 @@ import (
 	"sort"
 )
 
-var ErrCached = errors.New("package cached")
-
 type Package struct {
 	Name     string
 	URL      string
@@ -23,7 +21,7 @@ type Package struct {
 
 type Getter interface {
 	Get(pkg *Package, path string) (string, error)
-	List(pattern string) ([]*Package, error)
+	List(name string, ver string) ([]*Package, error)
 }
 
 func NewGetter(url0 string, args ...interface{}) (Getter, error) {

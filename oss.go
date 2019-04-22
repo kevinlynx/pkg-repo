@@ -62,8 +62,8 @@ func NewOssGetter(url0 string, confile string) (*OssGetter, error) {
 	}, nil
 }
 
-func (self *OssGetter) List(pattern string) ([]*Package, error) {
-	lor, err := self.bucket.ListObjects(oss.Prefix(path.Join(self.rootPath, pattern)))
+func (self *OssGetter) List(name string, ver string) ([]*Package, error) {
+	lor, err := self.bucket.ListObjects(oss.Prefix(path.Join(self.rootPath, name+"-"+ver)))
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (self *OssGetter) List(pattern string) ([]*Package, error) {
 	for _, object := range lor.Objects {
 		_, name := path.Split(object.Key)
 		pkg := &Package{Name: name, URL: object.Key, Checksum: strings.Trim(object.ETag, "\"")}
-		if err := pkg.parseVersion(pattern); err == nil {
+		if err := pkg.parseVersion(name); err == nil {
 			pkgs = append(pkgs, pkg)
 		}
 	}
@@ -82,7 +82,7 @@ func (self *OssGetter) Get(pkg *Package, dir string) (string, error) {
 	dstFile := path.Join(dir, pkg.Name)
 	chkSum, _ := md5sumFile(dstFile)
 	if strings.ToUpper(chkSum) == pkg.Checksum {
-		return dstFile, ErrCached
+		return dstFile, nil
 	}
 	err := self.bucket.GetObjectToFile(pkg.URL, dstFile)
 	return dstFile, err
