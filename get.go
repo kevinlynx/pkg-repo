@@ -10,6 +10,7 @@ import (
 	"os"
 	"regexp"
 	"sort"
+	"strings"
 )
 
 type Package struct {
@@ -37,6 +38,8 @@ func NewGetter(url0 string, args ...interface{}) (Getter, error) {
 			}
 		}
 		return NewOssGetter(url0, conffile)
+	} else if u.Scheme == "file" {
+		return NewLocalGetter(url0)
 	}
 	return nil, errors.New("not supported")
 }
@@ -79,6 +82,6 @@ func md5sumFile(path string) (string, error) {
 		return "", err
 	}
 	bytes := m.Sum(nil)
-	md5sum := fmt.Sprintf("%x", bytes)
+	md5sum := strings.ToUpper(fmt.Sprintf("%x", bytes))
 	return md5sum, nil
 }

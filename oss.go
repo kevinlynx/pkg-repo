@@ -84,7 +84,7 @@ func (self *OssGetter) List(name string, ver string) ([]*Package, error) {
 func (self *OssGetter) Get(pkg *Package, dir string) (string, error) {
 	dstFile := path.Join(dir, pkg.Name)
 	chkSum, _ := md5sumFile(dstFile)
-	if strings.ToUpper(chkSum) == pkg.Checksum {
+	if chkSum == pkg.Checksum {
 		return dstFile, nil
 	}
 	err := self.bucket.GetObjectToFile(pkg.URL, dstFile)
